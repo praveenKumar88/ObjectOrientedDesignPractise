@@ -78,68 +78,29 @@ public class LineProcessor {
         return formattedLine;
     }
 
-//    protected void processHowManyLine(String line) {
-//        try {
-//            String formattedLine = getFormattedLine(line);
-//            String[] keys = formattedLine.split("\\s");
-//            StringBuilder sb = new StringBuilder();
-//            Stack<Integer> cvalues = new Stack<Integer>();
-//            for (String key : keys) {
-//                if (inputStringToSymbolMap.get(key) != null && inputStringToValueMap.get(key) != null) {
-//                    sb.append(inputStringToSymbolMap.get(key));
-//                    cvalues.push(Integer.valueOf(inputStringToValueMap.get(key)));
-//                }
-//            }
-//            Integer res = 1;
-//            for (Integer cvalue : cvalues) res *= cvalue;
-//            Integer finalres = RomanToArabicConverter.convert(sb.toString()) * res;
-//            this.output.add(formattedLine + " is " + finalres + " Credits");
-//        } catch (Exception e) {
-//            log.info("invalid line type");
-//            System.out.println(e.getMessage());
-//        }
-//    }
-
     protected void processHowManyLine(String line) {
-
-        try
-        {
-            //Remove the unwanted words like "is" and "?"
+        try {
             String formatted = line.split("(\\sis\\s)")[1];
-
             formatted = formatted.replace("?","").trim();
-
-            // search for all numerals for their values to compute the result
             String[] keys = formatted.split("\\s");
-
             boolean found = false;
             String roman = "";
             String outputResult = null;
             Stack<Float> cvalues = new Stack<Float>();
-
-            for(String key : keys)
-            {
+            for(String key : keys) {
                 found = false;
-
                 String romanValue = inputStringToSymbolMap.get(key);
-                if(romanValue!=null)
-                {
+                if(romanValue!=null) {
                     roman += romanValue;
                     found = true;
                 }
-
                 String computedValue = inputStringToValueMap.get(key);
-                if(!found && computedValue!=null)
-                {
+                if(!found && computedValue!=null) {
                     cvalues.push(Float.parseFloat(computedValue));
                     found = true;
                 }
-
-
             }
-
-            if(found)
-            {
+            if(found) {
                 float res=1;
                 for(int i =0;i<cvalues.size();i++)
                     res *= cvalues.get(i);
@@ -149,19 +110,12 @@ public class LineProcessor {
                     finalres = (int)(Integer.parseInt(String.valueOf(RomanToArabicConverter.convert(roman)))*res);
                 outputResult = formatted +" is "+ finalres +" Credits";
             }
-
             this.output.add(outputResult);
-
         }
-        catch(Exception e)
-        {
+        catch(Exception e) {
             System.out.println("error");
-
         }
-
     }
-
-
 
     protected void processErrorLine() {
         this.output.add("I have no idea what you are talking about");
