@@ -13,7 +13,14 @@ For information regarding the numerical conversion, see RomanToArabicConverter.j
 To Run:
 
 - Execute ./run.sh
-- To run tests, execute ./test.sh 
+- To run tests, make sure you have junit in the classpath and then run java -cp *jar LineProcessorTest or load the project in an IDE and do Run>Run LineProcessorTest.java.
+
+Caution:
+
+- I have not included the junit jar with the submission for security reasons. 
+- I have not made run.sh executable with the submission for security reasons.
+- Please make sure the classpath is correct before running the application.
+- Please do chmod + x run.sh to make it executable. Otherwise you can copy-paste the contents to the command line and execture from there.
 
 
 
