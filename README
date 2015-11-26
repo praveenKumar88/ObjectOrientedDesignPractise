@@ -1,0 +1,19 @@
+Assumptions:
+
+- Its assumed that each line is terminated by newline. Ex: Testcase given in question
+- Questions are assumed to be end with '?' (without quotes). Ex: how much is glob pish ? 
+- Inputs are assumed to be case sensitive. Ex: glob is not GLOB.
+- keyword 'is' is assumed as a separator for identifiers and their values in Assignment statement. Ex: glob is I
+- Whenever you provide empty line the input process will be terminated and the application will show output.
+- Roman numbers must be specified in capitals.
+
+For more information regarding the parsing logic, see LineProcessor.java
+For information regarding the numerical conversion, see RomanToArabicConverter.java
+
+To Run:
+
+- Execute ./run.sh
+- To run tests, execute ./test.sh 
+
+
+

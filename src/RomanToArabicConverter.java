@@ -10,7 +10,7 @@ public class RomanToArabicConverter {
         }
     }
 
-    private static int getValueFromRomanChar(char romanChar) {
+    protected static int getValueFromRomanChar(char romanChar) {
         int value = -1;
         switch(romanChar) {
             case 'I' : value = Roman.I.getValue();
@@ -31,7 +31,7 @@ public class RomanToArabicConverter {
         return value;
     }
 
-    public static Integer convert(String roman) throws Exception {
+    protected static Integer convert(String roman) throws Exception {
         int tmp = 0;
         int arabicValueOfString =0;
         for(int i = roman.length()-1;i>=0;i--) {

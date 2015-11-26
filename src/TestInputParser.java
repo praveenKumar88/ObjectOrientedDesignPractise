@@ -17,13 +17,13 @@ public class TestInputParser {
         while (this.scan.hasNextLine() && (line = this.scan.nextLine()).length() > 0) {
             intputLinePattern = matchLineWithPattern(line);
             if (intputLinePattern.equals("patternAssigned")) {
-                lineProcessor.processAssignedLine(line);
+                lineProcessor.processKnownValues(line);
             } else if (intputLinePattern.equals("patternCredits")) {
-                lineProcessor.processCreditsLine(line);
+                lineProcessor.calculateUnknownValues(line);
             } else if (intputLinePattern.equals("patternHowMuch")) {
-                lineProcessor.processHowMuchLine(line);
+                lineProcessor.processQuestion(line);
             } else if (intputLinePattern.equals("patternHowMany")) {
-                lineProcessor.processHowManyLine(line);
+                lineProcessor.processQuestion(line);
             } else {
                 lineProcessor.processErrorLine();
             }

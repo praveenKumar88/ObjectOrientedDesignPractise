@@ -1,18 +1,18 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 public class LineProcessor {
 
-    private final HashMap<String, String> inputStringToValueMap;
+    private final HashMap<String, String> knownValueMap;
     private final ArrayList<String> output;
-    private HashMap<String, String> inputStringToSymbolMap;
+    private HashMap<String, Double> unknownValueMap;
     private static final Logger log = Logger.getLogger(String.valueOf(TestInputParser.class));
 
     public LineProcessor() {
-        this.inputStringToSymbolMap = new HashMap<String, String>();
-        this.inputStringToValueMap = new HashMap<String, String>();
+        this.unknownValueMap = new HashMap<String, Double>();
+        this.knownValueMap = new HashMap<String, String>();
         this.output = new ArrayList<String>();
     }
 
@@ -20,32 +20,14 @@ public class LineProcessor {
         return output;
     }
 
-    protected void processAssignedLine(String line) {
-        String[] keys = line.split("\\s+");
-        try {
-            inputStringToSymbolMap.put(keys[0], keys[2]);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            log.info("invalid line type");
-            System.out.println(e.getMessage());
-        }
-    }
-
     /**
-     * Handle input like "glob glob Silver is 34 Credits"
+     *
+     * Process known values into map so that these can be used to calculate unknowns
      */
-    protected void processCreditsLine(String line) {
+    protected void processKnownValues(String line) {
+        ArrayList<String> keys = getFormattedLine(line);
         try {
-            String formatted = line.replaceAll("(is\\s+)|([c|C]redits\\s*)", "").trim();
-            String[] keys = formatted.split("\\s+");
-            String unknownKey = keys[keys.length - 2];
-            float value = Float.parseFloat(keys[keys.length - 1]);
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < keys.length - 2; i++) {
-                sb.append(inputStringToSymbolMap.get(keys[i]));
-            }
-            int arabicValue = RomanToArabicConverter.convert(sb.toString());
-            float credit = value / arabicValue;
-            inputStringToValueMap.put(unknownKey, credit + "");
+            knownValueMap.put(keys.get(0), keys.get(1));
         } catch (Exception e) {
             log.info("invalid line type");
             System.out.println(e.getMessage());
@@ -53,70 +35,72 @@ public class LineProcessor {
     }
 
     /**
-     * Handle input queries like "how much is pish tegj glob glob ?"
+     *
+     * calculate unknown values from the known equivalents
      */
-    protected void processHowMuchLine(String line) {
-        try {
-            String formattedLine = getFormattedLine(line);
-            String keys[] = formattedLine.split("\\s+");
-            StringBuilder sb = new StringBuilder();
-            for (String key : keys) {
-                String romanValue = inputStringToSymbolMap.get(key);
-                sb.append(romanValue);
+    protected void calculateUnknownValues(String line) {
+        double knownValueSum = 0;
+        ArrayList<String> formattedLine = getFormattedLine(line);
+        double sumOfKnownAndUnknown = Integer.parseInt(formattedLine.get(formattedLine.size() - 1));
+        StringBuilder sb = new StringBuilder();
+        String unknownkey = formattedLine.get(formattedLine.size() - 2);
+        for(String key: getFormattedLine(line)) {
+            if(knownValueMap.containsKey(key)) {
+                    sb.append(knownValueMap.get(key));
             }
-            output.add(formattedLine + " is " + RomanToArabicConverter.convert(sb.toString()));
-        } catch (Exception e) {
-            log.info("incorrect line type");
-            System.out.println(e.getMessage());
-
+            try {
+                knownValueSum = RomanToArabicConverter.convert(sb.toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
+        unknownValueMap.put(unknownkey, (sumOfKnownAndUnknown/knownValueSum));
     }
 
-    private String getFormattedLine(String s) {
-        String formattedLine = s.split("\\sis\\s")[1].trim();
-        formattedLine = formattedLine.replace("?", "").trim();
-        return formattedLine;
-    }
-
-    protected void processHowManyLine(String line) {
+    /**
+     * Handle all questions like "how much is pish tegj glob glob ? or how many Credits is glob prok Iron ?"
+     */
+    protected void processQuestion(String line) {
+        int result = 0;
+        StringBuilder sb = new StringBuilder();
         try {
-            String formatted = line.split("(\\sis\\s)")[1];
-            formatted = formatted.replace("?","").trim();
-            String[] keys = formatted.split("\\s");
-            boolean found = false;
-            String roman = "";
-            String outputResult = null;
-            Stack<Float> cvalues = new Stack<Float>();
-            for(String key : keys) {
-                found = false;
-                String romanValue = inputStringToSymbolMap.get(key);
-                if(romanValue!=null) {
-                    roman += romanValue;
-                    found = true;
-                }
-                String computedValue = inputStringToValueMap.get(key);
-                if(!found && computedValue!=null) {
-                    cvalues.push(Float.parseFloat(computedValue));
-                    found = true;
+            String unknownKey = null;
+            for (String key : getFormattedLine(line)) {
+                if (knownValueMap.containsKey(key)) {
+                    sb.append(knownValueMap.get(key));
+                } else {
+                    unknownKey = key;
                 }
             }
-            if(found) {
-                float res=1;
-                for(int i =0;i<cvalues.size();i++)
-                    res *= cvalues.get(i);
-
-                int finalres= (int) res;
-                if(roman.length()>0)
-                    finalres = (int)(Integer.parseInt(String.valueOf(RomanToArabicConverter.convert(roman)))*res);
-                outputResult = formatted +" is "+ finalres +" Credits";
+            if (unknownKey == null) {
+                result = RomanToArabicConverter.convert(sb.toString());
+            } else {
+                result = (int) (RomanToArabicConverter.convert(sb.toString()) * unknownValueMap.get(unknownKey));
             }
-            this.output.add(outputResult);
+        } catch (Exception e1) {
+            e1.printStackTrace();
         }
-        catch(Exception e) {
-            System.out.println("error");
-        }
+        output.add(line + " is " + result);
     }
 
+    /**
+     *
+     *  Format the line input to delete unnecessary strings
+     */
+    private ArrayList<String> getFormattedLine(String line) {
+        ArrayList<String> wordList = new ArrayList<String>(Arrays.asList(line.split(" ")));
+            wordList.remove("is");
+            wordList.remove("much");
+            wordList.remove("many");
+            wordList.remove("?");
+            wordList.remove("Credits");
+            wordList.remove("how");
+        return wordList;
+    }
+
+    /**
+     * Handle error scenario
+     */
     protected void processErrorLine() {
         this.output.add("I have no idea what you are talking about");
     }
