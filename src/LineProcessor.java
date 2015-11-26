@@ -5,16 +5,23 @@ import java.util.logging.Logger;
 
 public class LineProcessor {
 
-    private final HashMap<String, String> knownValueMap;
-    private final ArrayList<String> output;
-    private HashMap<String, Double> unknownValueMap;
+    private HashMap<String, String> knownValueMap = new HashMap<String, String>();
+    private ArrayList<String> output = new ArrayList<String>();
+    private HashMap<String, Double> unknownValueMap = new HashMap<String, Double>();
     private static final Logger log = Logger.getLogger(String.valueOf(TestInputParser.class));
 
     public LineProcessor() {
-        this.unknownValueMap = new HashMap<String, Double>();
-        this.knownValueMap = new HashMap<String, String>();
-        this.output = new ArrayList<String>();
     }
+
+    /**
+     *
+     * provide the ability for the client to pass in the values of the conversion pairs
+     * (eg. V ->5) instead of hard-coding in the code
+     */
+    public LineProcessor(HashMap<String,String> keyValueMap) {
+        this.knownValueMap = keyValueMap;
+    }
+
 
     protected ArrayList<String> getOutput() {
         return output;
