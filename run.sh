@@ -1,3 +1,11 @@
+cd src
+count=$(ls -1 *.class | wc -l)
+if [ $count != 0 ]
+then
+echo "clean up..."
 rm *.class
-javac src/IntergalacticTranslator.java
-java src/IntergalacticTranslator
+fi
+echo "compiling..."
+javac *.java
+echo "executing..."
+java IntergalacticTranslator
