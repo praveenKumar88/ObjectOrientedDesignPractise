@@ -19,7 +19,7 @@ public class TestInputParser {
             if (intputLinePattern.equals("patternAssigned")) {
                 lineProcessor.processKnownValues(line);
             } else if (intputLinePattern.equals("patternCredits")) {
-                lineProcessor.calculateUnknownValues(line);
+                lineProcessor.processUnknownValues(line);
             } else if (intputLinePattern.equals("patternHowMuch")) {
                 lineProcessor.processQuestion(line);
             } else if (intputLinePattern.equals("patternHowMany")) {

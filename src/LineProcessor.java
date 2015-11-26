@@ -38,15 +38,24 @@ public class LineProcessor {
      *
      * calculate unknown values from the known equivalents
      */
-    protected void calculateUnknownValues(String line) {
-        double knownValueSum = 0;
+    protected void processUnknownValues(String line) {
         ArrayList<String> formattedLine = getFormattedLine(line);
+        String unknownkey = getUnknownKey(formattedLine);
+        double unknownValue = calculateUnknownValue(formattedLine);
+        unknownValueMap.put(unknownkey, unknownValue);
+    }
+
+    private String getUnknownKey(ArrayList<String> formattedLine) {
+        return formattedLine.get(formattedLine.size() - 2);
+    }
+
+    protected double calculateUnknownValue(ArrayList<String> formattedLine) {
+        double knownValueSum = 0;
         double sumOfKnownAndUnknown = Integer.parseInt(formattedLine.get(formattedLine.size() - 1));
         StringBuilder sb = new StringBuilder();
-        String unknownkey = formattedLine.get(formattedLine.size() - 2);
-        for(String key: getFormattedLine(line)) {
+        for(String key: formattedLine) {
             if(knownValueMap.containsKey(key)) {
-                    sb.append(knownValueMap.get(key));
+                sb.append(knownValueMap.get(key));
             }
             try {
                 knownValueSum = RomanToArabicConverter.convert(sb.toString());
@@ -54,13 +63,18 @@ public class LineProcessor {
                 e.printStackTrace();
             }
         }
-        unknownValueMap.put(unknownkey, (sumOfKnownAndUnknown/knownValueSum));
+        return (sumOfKnownAndUnknown/knownValueSum);
     }
 
     /**
      * Handle all questions like "how much is pish tegj glob glob ? or how many Credits is glob prok Iron ?"
      */
     protected void processQuestion(String line) {
+        int result = getAnswer(line);
+        output.add(line + " is " + result);
+    }
+
+    protected int getAnswer(String line) {
         int result = 0;
         StringBuilder sb = new StringBuilder();
         try {
@@ -80,14 +94,14 @@ public class LineProcessor {
         } catch (Exception e1) {
             e1.printStackTrace();
         }
-        output.add(line + " is " + result);
+        return result;
     }
 
     /**
      *
      *  Format the line input to delete unnecessary strings
      */
-    private ArrayList<String> getFormattedLine(String line) {
+    protected ArrayList<String> getFormattedLine(String line) {
         ArrayList<String> wordList = new ArrayList<String>(Arrays.asList(line.split(" ")));
             wordList.remove("is");
             wordList.remove("much");
